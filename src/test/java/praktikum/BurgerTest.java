@@ -14,7 +14,7 @@ public class BurgerTest {
     // ---------- setBuns ----------
 
     @Test
-    public void setBuns_shouldSetBun_andAffectPrice() {
+    public void setBunsShouldAffectPrice() {
         Burger burger = new Burger();
 
         Bun bun = mock(Bun.class);
@@ -22,24 +22,26 @@ public class BurgerTest {
 
         burger.setBuns(bun);
 
-        assertEquals(200f, burger.getPrice(), 0.001);
+        float expectedPrice = 200f;
+        assertEquals(expectedPrice, burger.getPrice(), 0.001);
     }
 
     // ---------- addIngredient ----------
 
     @Test
-    public void addIngredient_shouldIncreaseIngredientsListSize() {
+    public void addIngredientShouldIncreaseListSize() {
         Burger burger = new Burger();
 
         Ingredient ingredient = mock(Ingredient.class);
 
         burger.addIngredient(ingredient);
 
-        assertEquals(1, burger.ingredients.size());
+        int expectedSize = 1;
+        assertEquals(expectedSize, burger.ingredients.size());
     }
 
     @Test
-    public void addIngredient_shouldAffectPrice() {
+    public void addIngredientShouldAffectPrice() {
         Burger burger = new Burger();
 
         Bun bun = mock(Bun.class);
@@ -51,47 +53,67 @@ public class BurgerTest {
 
         burger.addIngredient(ingredient);
 
-        assertEquals(250f, burger.getPrice(), 0.001);
+        float expectedPrice = 250f;
+        assertEquals(expectedPrice, burger.getPrice(), 0.001);
     }
 
     // ---------- removeIngredient ----------
 
     @Test
-    public void removeIngredient_shouldRemoveIngredientByIndex() {
+    public void removeIngredientShouldDecreaseListSize() {
         Burger burger = new Burger();
 
-        Ingredient i1 = mock(Ingredient.class);
-        Ingredient i2 = mock(Ingredient.class);
+        Ingredient firstIngredient = mock(Ingredient.class);
+        Ingredient secondIngredient = mock(Ingredient.class);
 
-        burger.addIngredient(i1);
-        burger.addIngredient(i2);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
 
-        burger.removeIngredient(0);
+        int indexToRemove = 0;
+        burger.removeIngredient(indexToRemove);
 
-        assertEquals(1, burger.ingredients.size());
-        assertEquals(i2, burger.ingredients.get(0));
+        int expectedSize = 1;
+        assertEquals(expectedSize, burger.ingredients.size());
     }
 
     @Test
-    public void removeIngredient_shouldDecreasePrice() {
+    public void removeIngredientShouldShiftElementsLeft() {
+        Burger burger = new Burger();
+
+        Ingredient firstIngredient = mock(Ingredient.class);
+        Ingredient secondIngredient = mock(Ingredient.class);
+
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
+
+        int indexToRemove = 0;
+        burger.removeIngredient(indexToRemove);
+
+        assertEquals(secondIngredient, burger.ingredients.get(0));
+    }
+
+    @Test
+    public void removeIngredientShouldDecreasePrice() {
         Burger burger = new Burger();
 
         Bun bun = mock(Bun.class);
         when(bun.getPrice()).thenReturn(100f);
         burger.setBuns(bun);
 
-        Ingredient i1 = mock(Ingredient.class);
-        when(i1.getPrice()).thenReturn(50f);
+        Ingredient firstIngredient = mock(Ingredient.class);
+        when(firstIngredient.getPrice()).thenReturn(50f);
 
-        Ingredient i2 = mock(Ingredient.class);
-        when(i2.getPrice()).thenReturn(30f);
+        Ingredient secondIngredient = mock(Ingredient.class);
+        when(secondIngredient.getPrice()).thenReturn(30f);
 
-        burger.addIngredient(i1);
-        burger.addIngredient(i2);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
 
-        burger.removeIngredient(0);
+        int indexToRemove = 0;
+        burger.removeIngredient(indexToRemove);
 
-        assertEquals(230f, burger.getPrice(), 0.001);
+        float expectedPrice = 230f;
+        assertEquals(expectedPrice, burger.getPrice(), 0.001);
     }
 
     // ---------- moveIngredient (параметризация) ----------
@@ -99,13 +121,13 @@ public class BurgerTest {
     @RunWith(Parameterized.class)
     public static class MoveIngredientParameterizedTest {
 
-        private final int from;
-        private final int to;
+        private final int fromIndex;
+        private final int toIndex;
         private final int expectedFirstIndex;
 
-        public MoveIngredientParameterizedTest(int from, int to, int expectedFirstIndex) {
-            this.from = from;
-            this.to = to;
+        public MoveIngredientParameterizedTest(int fromIndex, int toIndex, int expectedFirstIndex) {
+            this.fromIndex = fromIndex;
+            this.toIndex = toIndex;
             this.expectedFirstIndex = expectedFirstIndex;
         }
 
@@ -118,65 +140,97 @@ public class BurgerTest {
         }
 
         @Test
-        public void moveIngredient_shouldChangeOrderCorrectly() {
+        public void moveIngredientShouldChangeOrderCorrectly() {
             Burger burger = new Burger();
 
-            Ingredient i1 = mock(Ingredient.class);
-            Ingredient i2 = mock(Ingredient.class);
+            Ingredient firstIngredient = mock(Ingredient.class);
+            Ingredient secondIngredient = mock(Ingredient.class);
 
-            burger.addIngredient(i1);
-            burger.addIngredient(i2);
+            burger.addIngredient(firstIngredient);
+            burger.addIngredient(secondIngredient);
 
-            burger.moveIngredient(from, to);
+            burger.moveIngredient(fromIndex, toIndex);
 
-            Ingredient expectedFirst = expectedFirstIndex == 0 ? i1 : i2;
+            Ingredient expectedFirst =
+                    expectedFirstIndex == 0 ? firstIngredient : secondIngredient;
 
             assertEquals(expectedFirst, burger.ingredients.get(0));
         }
     }
 
     @Test
-    public void moveIngredient_sameIndex_shouldNotChangeOrder() {
+    public void moveIngredientSameIndexShouldKeepFirstElement() {
         Burger burger = new Burger();
 
-        Ingredient i1 = mock(Ingredient.class);
-        Ingredient i2 = mock(Ingredient.class);
+        Ingredient firstIngredient = mock(Ingredient.class);
+        Ingredient secondIngredient = mock(Ingredient.class);
 
-        burger.addIngredient(i1);
-        burger.addIngredient(i2);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
 
-        burger.moveIngredient(0, 0);
+        int index = 0;
+        burger.moveIngredient(index, index);
 
-        assertEquals(i1, burger.ingredients.get(0));
-        assertEquals(i2, burger.ingredients.get(1));
+        assertEquals(firstIngredient, burger.ingredients.get(0));
+    }
+
+    @Test
+    public void moveIngredientSameIndexShouldKeepSecondElement() {
+        Burger burger = new Burger();
+
+        Ingredient firstIngredient = mock(Ingredient.class);
+        Ingredient secondIngredient = mock(Ingredient.class);
+
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
+
+        int index = 0;
+        burger.moveIngredient(index, index);
+
+        assertEquals(secondIngredient, burger.ingredients.get(1));
     }
 
     // ---------- getPrice ----------
 
     @Test
-    public void getPrice_shouldReturnCorrectPrice_withMultipleIngredients() {
+    public void getPriceShouldReturnCorrectPrice() {
         Burger burger = new Burger();
 
         Bun bun = mock(Bun.class);
         when(bun.getPrice()).thenReturn(100f);
         burger.setBuns(bun);
 
-        Ingredient i1 = mock(Ingredient.class);
-        when(i1.getPrice()).thenReturn(50f);
+        Ingredient firstIngredient = mock(Ingredient.class);
+        when(firstIngredient.getPrice()).thenReturn(50f);
 
-        Ingredient i2 = mock(Ingredient.class);
-        when(i2.getPrice()).thenReturn(30f);
+        Ingredient secondIngredient = mock(Ingredient.class);
+        when(secondIngredient.getPrice()).thenReturn(30f);
 
-        burger.addIngredient(i1);
-        burger.addIngredient(i2);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
 
-        assertEquals(280f, burger.getPrice(), 0.001);
+        float expectedPrice = 280f;
+        assertEquals(expectedPrice, burger.getPrice(), 0.001);
     }
 
     // ---------- getReceipt ----------
 
     @Test
-    public void getReceipt_shouldContainCorrectData() {
+    public void getReceiptShouldContainBun() {
+        Burger burger = new Burger();
+
+        Bun bun = mock(Bun.class);
+        when(bun.getName()).thenReturn("black bun");
+        when(bun.getPrice()).thenReturn(100f);
+        burger.setBuns(bun);
+
+        String receipt = burger.getReceipt();
+
+        assertTrue(receipt.contains("(==== black bun ====)"));
+    }
+
+    @Test
+    public void getReceiptShouldContainIngredient() {
         Burger burger = new Burger();
 
         Bun bun = mock(Bun.class);
@@ -193,8 +247,20 @@ public class BurgerTest {
 
         String receipt = burger.getReceipt();
 
-        assertTrue(receipt.contains("(==== black bun ====)"));
         assertTrue(receipt.contains("= filling cheese ="));
+    }
+
+    @Test
+    public void getReceiptShouldContainPrice() {
+        Burger burger = new Burger();
+
+        Bun bun = mock(Bun.class);
+        when(bun.getName()).thenReturn("black bun");
+        when(bun.getPrice()).thenReturn(100f);
+        burger.setBuns(bun);
+
+        String receipt = burger.getReceipt();
+
         assertTrue(receipt.contains("Price:"));
     }
 }
